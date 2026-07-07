@@ -4,5 +4,22 @@
 <body>
   <h1>EVOLVE Observability</h1>
   <p>Standard SOV Program &mdash; +ui module. This page is server-rendered with Jinja2.</p>
+  {% if samples %}
+  <table>
+    <tbody>
+      {% for s in samples %}
+      <tr data-testid="meter-sample-row">
+        <td>{{ s.cycle_id }}</td>
+        <td>{{ s.arm }}</td>
+        <td>{{ s.source }}</td>
+        <td>{{ s.measured_at }}</td>
+        <td>{{ s.metrics }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div data-testid="samples-empty">no samples yet</div>
+  {% endif %}
 </body>
 </html>
