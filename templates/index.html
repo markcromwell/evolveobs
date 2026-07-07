@@ -13,7 +13,15 @@
         <td>{{ s.arm }}</td>
         <td>{{ s.source }}</td>
         <td>{{ s.measured_at }}</td>
-        <td>{{ s.metrics }}</td>
+        <td>
+          {% if s.metrics is mapping %}
+            {% for k, v in s.metrics.items() %}
+              {{ k }}: {{ v }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          {% else %}
+            {{ s.metrics }}
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
@@ -23,3 +31,4 @@
   {% endif %}
 </body>
 </html>
+
