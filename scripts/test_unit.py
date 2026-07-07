@@ -200,3 +200,105 @@ def test_get_index_cycles_failure_resilience():
         assert "no cycles yet" in html
         assert html.count('data-testid="cycle-row"') == 0
 
+
+def test_get_index_cycles_oracle_version():
+    mock_cycles = [
+        {
+            "slice_index": 1,
+            "slice_worked": 10,
+            "story_done": True,
+            "progress": "IMPROVING",
+            "breaker_action": "CONTINUE",
+            "is_seed": True,
+            "oracle_version": "seed",
+        },
+        {
+            "slice_index": 2,
+            "slice_worked": 5,
+            "story_done": False,
+            "progress": "STAGNANT",
+            "breaker_action": "HALT",
+            "is_seed": False,
+            "oracle_version": "two_half_rich_probe_v1",
+        },
+        {
+            "slice_index": 3,
+            "slice_worked": 2,
+            "story_done": False,
+            "progress": "STAGNANT",
+            "breaker_action": "HALT",
+            "is_seed": False,
+            # oracle_version is missing entirely
+        },
+        {
+            "slice_index": 4,
+            "slice_worked": 1,
+            "story_done": False,
+            "progress": "STAGNANT",
+            "breaker_action": "HALT",
+            "is_seed": False,
+            "oracle_version": None,
+        },
+        {
+            "slice_index": 5,
+            "slice_worked": 1,
+            "story_done": False,
+            "progress": "STAGNANT",
+            "breaker_action": "HALT",
+            "is_seed": False,
+            "oracle_version": "",
+        }
+    ]
+    with patch("app.routers.web.httpx.get") as mock_get:
+        def side_effect(url, *args, **kwargs):
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            if "/evolve/samples" in url:
+                mock_resp.json.return_value = {"samples": []}
+            elif "/evolve/cycles" in url:
+                mock_resp.json.return_value = {"cycles": mock_cycles}
+            return mock_resp
+        mock_get.side_effect = side_effect
+
+        resp = client.get("/")
+        assert resp.status_code == 200
+        html = resp.text
+
+        # Verify cycles table is rendered with 5 rows
+        assert html.count('data-testid="cycle-row"') == 5
+        assert "cycles-empty" not in html
+
+        # Verify exactly one cycle-oracle-version span per cycle row
+        assert html.count('data-testid="cycle-oracle-version"') == 5
+
+        # Verify specific values rendered
+        assert 'data-testid="cycle-oracle-version">seed</span>' in html
+        assert 'data-testid="cycle-oracle-version">two_half_rich_probe_v1</span>' in html
+        
+        # Verify fallback values (missing, None, and empty string all resolve to 'unknown')
+        assert html.count('data-testid="cycle-oracle-version">unknown</span>') == 3
+
+
+def test_get_index_cycles_oracle_version_empty():
+    with patch("app.routers.web.httpx.get") as mock_get:
+        def side_effect(url, *args, **kwargs):
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            if "/evolve/samples" in url:
+                mock_resp.json.return_value = {"samples": []}
+            elif "/evolve/cycles" in url:
+                mock_resp.json.return_value = {"cycles": []}
+            return mock_resp
+        mock_get.side_effect = side_effect
+
+        resp = client.get("/")
+        assert resp.status_code == 200
+        html = resp.text
+
+        # Verify cycles-empty is present
+        assert "cycles-empty" in html
+        assert "no cycles yet" in html
+        assert html.count('data-testid="cycle-row"') == 0
+        assert html.count('data-testid="cycle-oracle-version"') == 0
+
+
