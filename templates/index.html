@@ -35,6 +35,14 @@
         <td>{{ c.progress }}</td>
         <td>{{ c.breaker_action }}</td>
         <td>
+          <span data-testid="done-layer-fidelity">{{ c.layer_fidelity or c.fidelity or 'UNKNOWN' }}</span>
+          <span data-testid="done-layer-executable_acceptance">{{ c.layer_executable_acceptance or c.executable_acceptance or 'UNKNOWN' }}</span>
+          <span data-testid="done-layer-negative_tests">{{ c.layer_negative_tests or c.negative_tests or 'UNKNOWN' }}</span>
+          <span data-testid="done-layer-runtime_probe">{{ c.layer_runtime_probe or c.runtime_probe or 'UNKNOWN' }}</span>
+          <span data-testid="done-layer-hollow_probe">{{ c.layer_hollow_probe or c.hollow_probe or 'UNKNOWN' }}</span>
+        </td>
+        <td>{{ c.evidence_refs }}</td>
+        <td>
           {% if c.is_seed %}
           <span data-testid="seed-badge">seed</span>
           {% endif %}

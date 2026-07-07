@@ -53,11 +53,13 @@ def index(request: Request):
     try:
         response = httpx.get(
             f"{settings.mcp_url}/evolve/cycles",
+            params={"limit": 50},
             headers=headers,
             timeout=5.0,
         )
         response.raise_for_status()
-        cycles = response.json()["cycles"]
+        data = response.json()
+        cycles = data.get("cycles", []) if isinstance(data, dict) else []
     except Exception:
         cycles = []
 

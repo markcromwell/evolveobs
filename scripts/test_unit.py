@@ -174,6 +174,7 @@ def test_get_index_cycles_success():
             assert mock_get.call_count == 2
             args, kwargs = mock_get.call_args_list[1]
             assert "http://mcp-test/evolve/cycles" in args[0]
+            assert kwargs["params"] == {"limit": 50}
             assert kwargs["headers"] == {"X-API-Key": "test-api-key"}
             assert kwargs["timeout"] == 5.0
 
