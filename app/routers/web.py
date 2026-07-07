@@ -50,12 +50,24 @@ def index(request: Request):
     except Exception:
         samples = []
 
+    try:
+        response = httpx.get(
+            f"{settings.mcp_url}/evolve/cycles",
+            headers=headers,
+            timeout=5.0,
+        )
+        response.raise_for_status()
+        cycles = response.json()["cycles"]
+    except Exception:
+        cycles = []
+
     return _templates.TemplateResponse(
         "index.html",
         {
             "request": request,
             "app_name": "EVOLVE Observability",
             "samples": samples,
+            "cycles": cycles,
         },
     )
 

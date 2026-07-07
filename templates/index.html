@@ -21,5 +21,28 @@
     </tbody>
   </table>
   {% endif %}
+
+  {% if not cycles %}
+  <div data-testid="cycles-empty">no cycles yet</div>
+  {% else %}
+  <table>
+    <tbody>
+      {% for c in cycles %}
+      <tr data-testid="cycle-row">
+        <td>{{ c.slice_index }}</td>
+        <td>{{ c.slice_worked }}</td>
+        <td>{{ c.story_done }}</td>
+        <td>{{ c.progress }}</td>
+        <td>{{ c.breaker_action }}</td>
+        <td>
+          {% if c.is_seed %}
+          <span data-testid="seed-badge">seed</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
 </body>
 </html>
