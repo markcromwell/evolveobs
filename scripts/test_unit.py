@@ -33,13 +33,22 @@ def test_get_index_success():
     with patch("app.routers.web.httpx.get") as mock_get:
         mock_resp = MagicMock()
         mock_resp.status_code = 200
-        mock_resp.json.return_value = mock_samples
+        mock_resp.json.return_value = {"samples": mock_samples}
         mock_get.return_value = mock_resp
 
         resp = client.get("/")
         assert resp.status_code == 200
         html = resp.text
-        assert "meter-sample-row" in html
+        
+        # Verify row-count equals sample-count
+        row_count = html.count('data-testid="meter-sample-row"')
+        assert row_count == len(mock_samples)
+        assert row_count > 0
+
+        # Verify mutual exclusivity: when rows > 0, empty-state is not present
+        assert "samples-empty" not in html
+        assert "no samples yet" not in html
+
         assert "cycle-123" in html
         assert "treatment" in html
         assert "sensor-1" in html
@@ -49,13 +58,31 @@ def test_get_index_success():
         assert "control" in html
         assert "sensor-2" in html
         assert "2026-07-07T01:00:00Z" in html
-        assert "samples-empty" not in html
 
         mock_get.assert_called_once()
         args, kwargs = mock_get.call_args
         assert "/evolve/samples" in args[0]
         assert kwargs["params"] == {"limit": 50}
         assert kwargs["timeout"] == 5.0
+
+
+def test_get_index_empty_envelope():
+    with patch("app.routers.web.httpx.get") as mock_get:
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"samples": []}
+        mock_get.return_value = mock_resp
+
+        resp = client.get("/")
+        assert resp.status_code == 200
+        html = resp.text
+        
+        # Verify row-count is 0
+        assert html.count('data-testid="meter-sample-row"') == 0
+        
+        # Verify mutual exclusivity: when rows == 0, empty-state is present
+        assert "samples-empty" in html
+        assert "no samples yet" in html
 
 
 def test_get_index_failure():
@@ -65,7 +92,11 @@ def test_get_index_failure():
         resp = client.get("/")
         assert resp.status_code == 200
         html = resp.text
+        
+        # Verify row-count is 0
+        assert html.count('data-testid="meter-sample-row"') == 0
+        
+        # Verify mutual exclusivity: when rows == 0, empty-state is present
         assert "samples-empty" in html
         assert "no samples yet" in html
-        assert "meter-sample-row" not in html
 

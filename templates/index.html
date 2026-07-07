@@ -4,7 +4,9 @@
 <body>
   <h1>EVOLVE Observability</h1>
   <p>Standard SOV Program &mdash; +ui module. This page is server-rendered with Jinja2.</p>
-  {% if samples %}
+  {% if not samples %}
+  <div data-testid="samples-empty">no samples yet</div>
+  {% else %}
   <table>
     <tbody>
       {% for s in samples %}
@@ -18,8 +20,6 @@
       {% endfor %}
     </tbody>
   </table>
-  {% else %}
-  <div data-testid="samples-empty">no samples yet</div>
   {% endif %}
 </body>
 </html>

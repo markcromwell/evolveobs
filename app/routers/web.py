@@ -45,7 +45,8 @@ def index(request: Request):
             timeout=5.0,
         )
         response.raise_for_status()
-        samples = response.json()
+        data = response.json()
+        samples = data.get("samples", []) if isinstance(data, dict) else []
     except Exception:
         samples = []
 
