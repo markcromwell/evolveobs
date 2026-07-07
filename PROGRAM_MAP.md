@@ -1,7 +1,7 @@
 # Program Map: EVOLVE Observability
 
-<!--GENERATED:BEGIN hash=b79e47b1a2a7e21e4d73caa7958cd6830d106ae502457fd2514a22c76cd19284 sig= job=0 commit=322ee7346a4ae85a5bf769b66decf8bd5853eef9-->
-<!--Generated 2026-07-07T07:39:24.712386+00:00. Do not edit — will be overwritten.-->
+<!--GENERATED:BEGIN hash=22f9eefeb51e8f4adb43e486822d3530ddc59c161ffba41a68d17771315c3ae0 sig= job=0 commit=b04cfbc9a38e9fd5468bc888c0061e708e5a2653-->
+<!--Generated 2026-07-07T09:12:02.440270+00:00. Do not edit — will be overwritten.-->
 
 ## II. Canonical Data Schema [GENERATED — do not edit]
 
@@ -30,6 +30,7 @@ requirements.lock
 scripts/setup.py
 scripts/smoke_boot.py
 scripts/test_unit.py
+scripts/test_web_cycles.py
 templates/index.html
 ```
 
