@@ -19,12 +19,6 @@ for frame_info in inspect.stack():
         if app_inst:
             app_inst.router.routes = [r for r in app_inst.router.routes if getattr(r, "path", None) != "/"]
 
-# Ensure settings has x_api_key and mcp_url for parity and testing
-if not hasattr(settings, "x_api_key"):
-    object.__setattr__(settings, "x_api_key", os.environ.get("X_API_KEY", ""))
-if not hasattr(settings, "mcp_url"):
-    object.__setattr__(settings, "mcp_url", os.environ.get("MCP_URL", os.environ.get("UAT_MCP_URL", "http://mcp-internal")))
-
 
 router = APIRouter(tags=["web"])
 _TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
@@ -42,10 +36,11 @@ def index(request: Request):
             f"{settings.mcp_url}/evolve/samples",
             params={"limit": 50},
             headers=headers,
-            timeout=5.0,
+            timeout=settings.request_timeout,
         )
         response.raise_for_status()
-        samples = response.json()
+        data = response.json()
+        samples = data["samples"] if isinstance(data, dict) and "samples" in data else []
     except Exception:
         samples = []
 
@@ -57,4 +52,5 @@ def index(request: Request):
             "samples": samples,
         },
     )
+
 
